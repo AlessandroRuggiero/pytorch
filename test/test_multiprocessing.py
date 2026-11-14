@@ -12,6 +12,7 @@ from sys import platform
 import torch
 import torch.cuda
 import torch.multiprocessing as mp
+import torch.multiprocessing.pool
 import torch.utils.hooks
 from torch.nn import Parameter
 from torch.testing._internal.common_cuda import IS_JETSON
@@ -800,6 +801,10 @@ class TestMultiprocessing(_MultiprocessingTestMixin, TestCase):
     def test_fs_pool(self):
         with fs_sharing():
             self._test_pool(repeat=TEST_REPEATS)
+
+    def test_torch_pool(self):
+        # mp.Pool is the stdlib Pool; this checks torch.multiprocessing.pool.Pool
+        self._test_pool(ctx=mp.pool)
 
     @unittest.skipIf(not HAS_SHM_FILES, "don't not how to check if shm files exist")
     def test_fs(self):
