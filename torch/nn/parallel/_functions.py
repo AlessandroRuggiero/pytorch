@@ -114,9 +114,9 @@ class Gather(Function):
         return output
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, *grad_outputs):
         scattered_grads = Scatter.apply(
-            ctx.input_gpus, ctx.input_sizes, ctx.dim, grad_output
+            ctx.input_gpus, ctx.input_sizes, ctx.dim, *grad_outputs
         )
         if ctx.unsqueezed_scalar:
             scattered_grads = tuple(g[0] for g in scattered_grads)
@@ -162,11 +162,12 @@ _streams: list[torch.Stream | None] | None = None
 def _get_stream(device: torch.device):
     """Get a background stream for copying between CPU and target device."""
     global _streams
-    if device.type == "cpu" or not torch.accelerator.is_available():
+    accelerator = torch.accelerator.current_accelerator(check_available=True)
+    if device.type == "cpu" or accelerator is None:
         return None
-    if torch.accelerator.current_accelerator().type != device.type:
+    if accelerator.type != device.type:
         raise AssertionError(
-            f"Expected current accelerator type {torch.accelerator.current_accelerator().type} "
+            f"Expected current accelerator type {accelerator.type} "
             f"to match device type {device.type}"
         )
     if _streams is None:

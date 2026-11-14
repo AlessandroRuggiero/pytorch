@@ -35,7 +35,6 @@ project-excludes = [
   "torch/distributed/fsdp/fully_sharded_data_parallel.py",
   "torch/ao/quantization/pt2e/_affine_quantization.py",
   "torch/nn/modules/pooling.py",
-  "torch/nn/parallel/_functions.py",
   "torch/_appdirs.py",
   "torch/multiprocessing/pool.py",
   "torch/overrides.py",
